@@ -23,6 +23,7 @@ struct ContentView: View {
                             
                             // MARK: Temperature Card
                             ClimateCard(iconName: "thermometer", index: "Outside temp.", measure: "-10°")
+                            
                         }
                     }
                 }
