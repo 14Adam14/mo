@@ -21,7 +21,8 @@ struct ThermometerView: View {
     
     var body: some View {
         ZStack {
-            
+            // MARK: Thermometer Scale
+            ThermometerScaleView()
             
             // MARK: Placeholder
             ThermometerPlaceholderView()
@@ -39,8 +40,12 @@ struct ThermometerView: View {
             
             
             // MARK: Thermometer dial
+            ThermometerDialView(degrees: degrees)
             
-             ThermometerDialView(degrees: degrees)
+            // MARK: Thermometer summary
+            ThermometerSummaryView(status: .heating, showStatus: true, temperature: 22)
+            
+            
         }
     }
 }
