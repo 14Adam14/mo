@@ -15,9 +15,33 @@ enum Status: String {
 
 struct ThermometerView: View {
     private let ringSize: CGFloat = 220
+    private let minTemperature: CGFloat = 4
+    private let maxTemperature: CGFloat = 30
     
-    @State private var ringValue: CGFloat = 0.5
+    
+    @State private var currentTemperature: CGFloat = 0
     @State private var degrees: CGFloat = 36
+    
+    var targetTemperature: CGFloat {
+        return min(max(degrees / 360 * 40, minTemperature), maxTemperature)
+    }
+    
+    
+    var ringValue: CGFloat {
+        return currentTemperature / 40
+    }
+    
+    
+    var status: Status {
+        if currentTemperature < targetTemperature {
+            return .heating
+        } else if currentTemperature > targetTemperature {
+            return .cooling
+        } else {
+            return .reaching
+        }
+    }
+    
     
     var body: some View {
         ZStack {
@@ -43,9 +67,11 @@ struct ThermometerView: View {
             ThermometerDialView(degrees: degrees)
             
             // MARK: Thermometer summary
-            ThermometerSummaryView(status: .heating, showStatus: true, temperature: 22)
-            
-            
+            ThermometerSummaryView(status: .heating, showStatus: true, temperature: currentTemperature)
+        }
+        .onAppear {
+            currentTemperature = 22
+            degrees = currentTemperature / 40 * 360
         }
     }
 }

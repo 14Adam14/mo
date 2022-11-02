@@ -16,6 +16,12 @@ struct ContentView: View {
                 
                 ScrollView{
                     VStack(spacing: 0) {
+                        // MARK: Thermometer
+                        ThermometerView()
+                            .padding(.top, 30)
+                            .padding(.bottom,60)
+                        
+                        
                         // MARK: Smart Systems
                         HStack(spacing: 20) {
                             // MARK: Humidity Card

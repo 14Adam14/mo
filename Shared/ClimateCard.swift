@@ -16,12 +16,14 @@ struct ClimateCard: View {
             // MARK: Card
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(Color("Card Background"))
-                .shadow(color: Color("Card Shadow"), radius: 40, x: 0, y: 20)
+               // .shadow(color: Color("Card Shadow"), radius: 40, x: 0, y: 20)
+            
                 // MARK: Card Border
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .stroke(.white.opacity(0.1), lineWidth: 1)
             
             VStack(spacing: 10) {
+                
                  // MARK: Circle Icon
                 Image(systemName: iconName)
                     .font(.title2.weight(.semibold))
@@ -30,6 +32,7 @@ struct ClimateCard: View {
                     .background(LinearGradient([Color("temperature ring 1"), Color("temperature ring 2")], startPoint: .top, endPoint: .bottom))
                     .clipShape(Circle())
                 VStack(spacing:8) {
+                    
                     // MARK: Index
                     Text(index)
                         .font(.headline)
