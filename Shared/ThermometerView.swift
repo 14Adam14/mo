@@ -15,12 +15,19 @@ enum Status: String {
 
 struct ThermometerView: View {
     private let ringSize: CGFloat = 220
+    private let outerDialSize: CGFloat = 200
     private let minTemperature: CGFloat = 4
     private let maxTemperature: CGFloat = 30
     
     
     @State private var currentTemperature: CGFloat = 0
     @State private var degrees: CGFloat = 36
+    @State private var showStatus = false
+    
+//    @State private var x: CGFloat = 0
+//    @State private var y: CGFloat = 0
+//    @State private var angle: CGFloat = 0
+    
     
     var targetTemperature: CGFloat {
         return min(max(degrees / 360 * 40, minTemperature), maxTemperature)
@@ -41,6 +48,11 @@ struct ThermometerView: View {
             return .reaching
         }
     }
+    
+    let timer = Timer
+        .publish(every: 1, on: .main, in: .common)
+        .autoconnect()
+    
     
     
     var body: some View {
@@ -65,14 +77,60 @@ struct ThermometerView: View {
             
             // MARK: Thermometer dial
             ThermometerDialView(degrees: degrees)
+                .gesture(
+                    DragGesture()
+                        .onChanged({ value in
+                            let x = min(max(value.location.x, 0), outerDialSize)
+                            let y = min(max(value.location.y, 0), outerDialSize)
+//                            self.x = x
+//                            self.y = y
+                            
+                            let endPoint = CGPoint(x: x, y: y)
+                            let centerPoint = CGPoint(x: outerDialSize / 2, y: outerDialSize / 2)
+                            
+                            let angle = calculateAngle(centerPoint: centerPoint, endPoint: endPoint)
+
+                            
+                            if angle < 36 || angle > 270 { return }
+//                          self.angle = angle
+                            
+                            degrees = angle - angle.remainder(dividingBy: 9)
+                        })
+                )
+            
             
             // MARK: Thermometer summary
-            ThermometerSummaryView(status: .heating, showStatus: true, temperature: currentTemperature)
+            ThermometerSummaryView(status: status, showStatus: showStatus, temperature: currentTemperature)
+            
+//            VStack {
+//                Text("x: \(x), y: \(y)")
+//                Text("angle: \(angle.formatted())")
+//                Text("degrees: \(degrees.formatted())")
+//                Spacer()
+//            }
+//            .foregroundColor(.white)
         }
         .onAppear {
             currentTemperature = 22
             degrees = currentTemperature / 40 * 360
         }
+        .onReceive(timer) { _ in
+            switch status {
+            case .heating:
+                showStatus = true
+                currentTemperature += 1
+            case .cooling:
+                showStatus = true
+                currentTemperature -= 1
+            case .reaching:
+                showStatus = false
+                break
+            }
+        }
+        .onDisappear {
+            timer.upstream.connect().cancel()
+        }
+        
     }
 }
 
@@ -81,5 +139,16 @@ struct ThermometerView_Previews: PreviewProvider {
         ThermometerView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("Background"))
+    }
+}
+
+
+extension ThermometerView {
+    private func calculateAngle(centerPoint: CGPoint, endPoint: CGPoint) -> CGFloat
+    {
+        let radians = atan2(endPoint.x - centerPoint.x, centerPoint.x - endPoint.y)
+        let degrees = 180 + (radians * 180 / .pi)
+        
+        return degrees
     }
 }
